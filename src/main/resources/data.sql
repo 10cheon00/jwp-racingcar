@@ -18,7 +18,6 @@ CREATE TABLE PLAY_RESULT (
     player_id INT NOT NULL,
     racing_game_id INT NOT NULL,
     position INT NOT NULL default 0,
-    is_winner BIT NOT NULL default 0,
     PRIMARY KEY(id),
     FOREIGN KEY(player_id) REFERENCES PLAYER(id),
     FOREIGN KEY(racing_game_id) REFERENCES racing_game(id)
