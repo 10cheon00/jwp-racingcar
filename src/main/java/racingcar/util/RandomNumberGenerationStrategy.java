@@ -1,7 +1,5 @@
 package racingcar.util;
 
-import racingcar.util.NumberGenerationStrategy;
-
 import java.util.Random;
 
 public class RandomNumberGenerationStrategy implements NumberGenerationStrategy {

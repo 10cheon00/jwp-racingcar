@@ -34,8 +34,8 @@ public class PlayResultRepositoryTest {
         PlayerDao p2 = playerRepository.save("p2");
         RacingGameDao r1 = racingGameRepository.save(createdAt);
         // when
-        PlayResultDao result1 = playResultRepository.save(p1.getId(), r1.getId(), 3);
-        PlayResultDao result2 = playResultRepository.save(p2.getId(), r1.getId(), 5);
+        PlayResultDao result1 = playResultRepository.save(p1.getId(), r1.getId(), 3, false);
+        PlayResultDao result2 = playResultRepository.save(p2.getId(), r1.getId(), 5, true);
         // then
         assertThat(result1.getRacingGameId()).isEqualTo(result2.getRacingGameId());
         assertThat(result1.getPlayerId()).isEqualTo(p1.getId());

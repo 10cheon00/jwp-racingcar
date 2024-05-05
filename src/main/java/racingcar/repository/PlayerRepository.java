@@ -3,13 +3,14 @@ package racingcar.repository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import racingcar.dao.PlayerDao;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 
 @Repository
+@Transactional
 public class PlayerRepository {
     private final JdbcTemplate jdbcTemplate;
 
@@ -29,14 +30,12 @@ public class PlayerRepository {
     }
 
     public boolean isExistName(String name) {
-        // todo: implement check existence query.
         String sql = "SELECT COUNT( name ) FROM PLAYER WHERE name = ?";
         return jdbcTemplate.queryForObject(sql, Integer.class, name) > 0;
     }
 
     public PlayerDao findByName(String name) {
-        // todo: implement search query.
-        String sql = "SELECT * FROM PLAYER WHERE name = ?";
-        return jdbcTemplate.queryForObject(sql, PlayerDao.class, name);
+        String sql = "SELECT id, name FROM PLAYER WHERE name = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{name}, (rs, rowNum) -> new PlayerDao(rs.getInt("id"), rs.getString("name")));
     }
 }

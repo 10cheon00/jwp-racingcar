@@ -27,6 +27,20 @@
 <script>
   const tbody = document.getElementById("gameHistory");
 
+  /*
+  result = [
+    {
+      "racingCars": [
+        {
+          "name": "",
+          "position": #
+        },
+      ],
+      "winners": names
+    },
+    ...
+  ]
+  */
   fetch('/plays')
       .then(response => response.json())
       .then(results => {
@@ -55,7 +69,6 @@
     for (let key in racingCars) {
       movesText += `${racingCars[key].name}: ${racingCars[key].position}<br>`;
     }
-    ;
     cell.innerHTML = movesText;
     return cell;
   }

@@ -1,8 +1,8 @@
 package racingcar.dao;
 
 public class PlayerDao {
-    private final Integer id;
-    private final String name;
+    private Integer id;
+    private String name;
 
     public PlayerDao(Integer id, String name) {
         this.id = id;
@@ -15,5 +15,13 @@ public class PlayerDao {
 
     public String getName() {
         return this.name;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

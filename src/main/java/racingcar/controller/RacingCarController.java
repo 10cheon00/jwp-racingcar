@@ -1,18 +1,14 @@
 package racingcar.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import racingcar.dao.PlayResultDao;
 import racingcar.dto.PlayResultDto;
 import racingcar.dto.RacingFormDto;
 import racingcar.service.RacingGameService;
 
 import java.util.List;
 
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/plays")
 public class RacingCarController {
     private final RacingGameService racingGameService;
@@ -22,19 +18,12 @@ public class RacingCarController {
     }
 
     @PostMapping("")
-    public String addPlayResult(Model model, @RequestBody RacingFormDto racingFormDto) {
-        // todo: implementation
-        List<PlayResultDto> playResultDtos = racingGameService.race(racingFormDto);
-
-        // todo: must return path of thymeleaf template.
-        model.addAttribute("playResultDtos", playResultDtos);
-        return "add-result";
+    public PlayResultDto addPlayResult(Model model, @RequestBody RacingFormDto racingFormDto) {
+        return racingGameService.race(racingFormDto);
     }
 
     @GetMapping("")
-    public List<PlayResultDto> getPlayResult() {
-        // todo: implementation
-        // return List<PlayResultDto>
-        return null;
+    public List<PlayResultDto> getPlayResult(Model model) {
+        return racingGameService.getAllResult();
     }
 }

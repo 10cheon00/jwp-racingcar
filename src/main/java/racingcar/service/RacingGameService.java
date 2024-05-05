@@ -2,9 +2,11 @@ package racingcar.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import racingcar.dao.NestedPlayResultDao;
 import racingcar.dao.PlayResultDao;
 import racingcar.dao.PlayerDao;
 import racingcar.dao.RacingGameDao;
+import racingcar.domain.RacingCar;
 import racingcar.dto.PlayResultDto;
 import racingcar.dto.RacingFormDto;
 import racingcar.repository.PlayResultRepository;
@@ -25,6 +27,7 @@ public class RacingGameService {
 
     private final NumberGenerationStrategy numberGenerationStrategy;
     private HashMap<String, Integer> playerData;
+    private List<String> winners;
 
     @Autowired
     public RacingGameService(
@@ -38,15 +41,16 @@ public class RacingGameService {
         this.numberGenerationStrategy = numberGenerationStrategy;
     }
 
-    public List<PlayResultDto> race(RacingFormDto racingFormDto) {
+    public PlayResultDto race(RacingFormDto racingFormDto) {
         parsePlayers(racingFormDto.getNames());
         run(racingFormDto.getCount());
+        findWinners();
         return saveResult();
     }
 
     private void parsePlayers(String names) {
         playerData = new HashMap<>();
-        String[] parsedNames = names.split(",");
+        String[] parsedNames = names.replace(" ", "").split(",");
         for (String parsedName : parsedNames) {
             playerData.put(parsedName, 0);
         }
@@ -71,23 +75,40 @@ public class RacingGameService {
         }
     }
 
-    private List<PlayResultDto> saveResult() {
+    private void findWinners() {
+        winners = new ArrayList<>();
+        int maxPosition = 0;
+        for (String name : playerData.keySet()) {
+            int position = playerData.get(name);
+            if (position > maxPosition) {
+                winners.clear();
+                winners.add(name);
+                maxPosition = position;
+            } else if (position == maxPosition) {
+                winners.add(name);
+            }
+        }
+    }
+
+    private PlayResultDto saveResult() {
         LocalDateTime createdAt = LocalDateTime.now();
         RacingGameDao racingGameDao = racingGameRepository.save(createdAt);
 
-        List<PlayResultDto> playResultDtos = new ArrayList<>();
+        List<RacingCar> racingCars = new ArrayList<>();
         for (String name : playerData.keySet()) {
             PlayerDao playerDao = getOrCreatePlayerDao(name);
 
             int position = playerData.get(name);
+            boolean isWinner = winners.contains(name);
             PlayResultDao playResultDao = playResultRepository.save(
                     playerDao.getId(),
                     racingGameDao.getId(),
-                    position);
-            playResultDtos.add(new PlayResultDto(name, playResultDao.getPosition()));
+                    position,
+                    isWinner);
+            racingCars.add(new RacingCar(name, playResultDao.getPosition()));
         }
 
-        return playResultDtos;
+        return new PlayResultDto(racingCars, winners);
     }
 
     private PlayerDao getOrCreatePlayerDao(String name) {
@@ -95,5 +116,18 @@ public class RacingGameService {
             return playerRepository.findByName(name);
         }
         return playerRepository.save(name);
+    }
+
+    public List<PlayResultDto> getAllResult() {
+        List<NestedPlayResultDao> nestedPlayResultDaos = playResultRepository.findAllWithWinnerByRacingGame();
+        // todo : modify PlayResultDto
+        // todo : convert nestedPlayResultDaos to playResult dto
+
+        // seems to inefficient.
+        List<PlayResultDto> playResultDtos = new ArrayList<>();
+        for (NestedPlayResultDao nestedPlayResultDao : nestedPlayResultDaos) {
+            playResultDtos.add(new PlayResultDto(nestedPlayResultDao));
+        }
+        return playResultDtos;
     }
 }
