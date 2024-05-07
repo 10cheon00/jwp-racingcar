@@ -9,6 +9,7 @@ import racingcar.dao.RacingGameDao;
 import racingcar.domain.RacingCar;
 import racingcar.dto.PlayResultDto;
 import racingcar.dto.RacingFormDto;
+import racingcar.exception.InvalidFormException;
 import racingcar.repository.PlayResultRepository;
 import racingcar.repository.PlayerRepository;
 import racingcar.repository.RacingGameRepository;
@@ -42,8 +43,12 @@ public class RacingGameService {
     }
 
     public PlayResultDto race(RacingFormDto racingFormDto) {
-        parsePlayers(racingFormDto.getNames());
-        run(racingFormDto.getCount());
+        try {
+            parsePlayers(racingFormDto.getNames());
+            run(racingFormDto.getCount());
+        } catch(Exception e) {
+            throw new InvalidFormException();
+        }
         findWinners();
         return saveResult();
     }
