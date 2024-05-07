@@ -91,15 +91,18 @@ public class RacingGameService {
     }
 
     private PlayResultDto saveResult() {
+        System.out.println("[LOG] ::: saveResult() ::: save RACING_GAME");
         LocalDateTime createdAt = LocalDateTime.now();
         RacingGameDao racingGameDao = racingGameRepository.save(createdAt);
 
         List<RacingCar> racingCars = new ArrayList<>();
         for (String name : playerData.keySet()) {
+            System.out.println("[LOG] ::: saveResult() ::: get or create PLAYER");
             PlayerDao playerDao = getOrCreatePlayerDao(name);
 
             int position = playerData.get(name);
             boolean isWinner = winners.contains(name);
+            System.out.println("[LOG] ::: saveResult() ::: save PLAY_RESULT");
             PlayResultDao playResultDao = playResultRepository.save(
                     playerDao.getId(),
                     racingGameDao.getId(),
@@ -112,13 +115,17 @@ public class RacingGameService {
     }
 
     private PlayerDao getOrCreatePlayerDao(String name) {
+        System.out.println("[LOG] ::: getOrCreatePlayerDao() ::: exist check");
         if (playerRepository.isExistName(name)) {
+            System.out.println("[LOG] ::: getOrCreatePlayerDao() ::: find PLAYER");
             return playerRepository.findByName(name);
         }
+        System.out.println("[LOG] ::: getOrCreatePlayerDao() ::: save PLAYER");
         return playerRepository.save(name);
     }
 
     public List<PlayResultDto> getAllResult() {
+        System.out.println("[LOG] ::: getAllResult() ::: find All with winner");
         List<NestedPlayResultDao> nestedPlayResultDaos = playResultRepository.findAllWithWinnerByRacingGame();
         // todo : modify PlayResultDto
         // todo : convert nestedPlayResultDaos to playResult dto
